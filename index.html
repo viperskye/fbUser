@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Facebook user database</title>
+    <link rel="stylesheet" href="http://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.1/semantic.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.semanticui.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/select/1.2.7/css/select.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+    <script src="https://use.fontawesome.com/releases/v5.0.0/js/all.js"></script>
+    <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.19/js/dataTables.semanticui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.1/semantic.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/select/1.2.7/js/dataTables.select.min.js"></script>
+</head>
+
+<body>
+    <div style="max-width: 1000px; margin: 5em auto;">
+        <table id="myTable" class="ui celled table hover stripe">
+            <thead>
+                <tr>
+                    <th>User Id</th>
+                    <th>Name</th>
+                    <th>Gender</th>
+                    <th>Location</th>
+                    <th>Email</th>
+                    <th>Mobile phone</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tfoot>
+                <tr>
+                    <th>User Id</th>
+                    <th>Name</th>
+                    <th>Gender</th>
+                    <th>Location</th>
+                    <th>Email</th>
+                    <th>Mobile phone</th>
+                    <th>Action</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    <script src="https://www.gstatic.com/firebasejs/4.10.0/firebase.js"></script>
+    <script>
+        $(document).ready(function () {
+            var nextkey = 0;
+            var config = {
+                apiKey: "AIzaSyCjngFwIVQk5-JuoFugPwjeNuX8earDk2g",
+                authDomain: "fbuser-267d7.firebaseapp.com",
+                databaseURL: "https://fbuser-267d7.firebaseio.com",
+                projectId: "fbuser-267d7",
+                storageBucket: "fbuser-267d7.appspot.com",
+                messagingSenderId: "1050226204791"
+            };
+            firebase.initializeApp(config);
+            var database = firebase.database();
+            firebase.database().ref('/users').once('value').then(function (snapshot) {
+                let userData = snapshot.val();
+                let fulldata = []
+                Object.keys(userData).forEach( gender => {
+                    Object.keys(userData[gender]).forEach( location => {
+                        Object.keys(userData[gender][location]).forEach( users => {
+                            fulldata.push(userData[gender][location][users]);
+                        })
+                    })
+                });
+                let table = $('#myTable').DataTable({
+                    data: fulldata,
+                    "lengthMenu": [[10, 25, 50, 100], [10, 25, 50, 100]],
+                    "columns": [{
+                            "data": "id",
+                        },
+                        {
+                            "data": "name"
+                        },
+                        {
+                            "data": "gender",
+                            defaultContent: "None"
+                        },
+                        {
+                            "data": "location.name",
+                            "defaultContent": ""
+                        },
+                        {
+                            "data": "email",
+                            "defaultContent": "None"
+                        },
+                        {
+                            "data": "mobile_phone",
+                            "defaultContent": "None"
+                        },
+                        {
+                            "data": "tag",
+                            "render": function ( data, type, row ) {
+                                return Object.keys(data||{}).join(',');
+                            },
+                            "defaultContent": "<button>Add Tag!</button>"
+                        },
+                    ],
+                    dom: 'Blfrtip',
+                    buttons: [
+                        {
+                            text: 'Select All',
+                            action: function () {
+                                table.rows({
+                                    search: 'applied'
+                                }).select()
+                            }
+                        },
+                        'selectNone',
+                        {
+                            text: 'Add Tags',
+                            action: function () {
+                                let tagName = prompt("Please enter Tag Name for all selected user", "Da Nang");
+                                let selectedData = table.rows( { selected: true } ).data();
+                                let length = selectedData.length;
+                                for (let index = 0; index < length; index++) {
+                                    let Data = selectedData[index];
+                                    let newData = Object.assign({},Data);
+                                    let node = 'users/'+(newData.gender || 'None')+'/'+(newData.location && newData.location.name || 'None') + '/' + newData.id;
+                                    if(tagName == 'done') {
+                                        console.log('Add Tags done success !');
+                                        return firebase.database().ref(node).remove();
+                                    }
+                                    if(newData.tag) newData.tag[tagName] = tagName
+                                    else newData.tag = {[tagName]: tagName};
+                                    firebase.database().ref(node).update(newData);
+                                    firebase.database().ref('tags/'+tagName).update({[newData.id]: newData});
+                                }
+                                console.log('Add Tags success !');
+                            }
+                        },
+                    ],
+                    select: true
+                });
+                $('#myTable tbody').on('click', 'button', function () {
+                    var data = table.row($(this).parents('tr')).data();
+                    alert(JSON.stringify(data));
+                });
+            });
+        });
+
+    </script>
+</body>
+
+</html>
