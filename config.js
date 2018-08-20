@@ -5,7 +5,10 @@ const NUMBER_POST = '5';
 const SEND_MESSAGE = false; // Set true if you want to enable auto send message
 const MESSAGE_TAG = 'hanoi'; //User who have this TAG will recieve your messages
 const TIME_DELAY = 3; // Time delay of each message
-const MESSAGE_TEXT = `Hello, bla bla bla`  // Content of message you want to send
+const MESSAGE_TEXT = `Hello, bla bla bla`;  // Content of message you want to send
+
+const FB_EMAIL = 'abc@gmail.com';
+const FB_PASS  = 'password';
 
 
 const REMOVE_OLD = false; // WARNING:  default is false, set true if you want to delete all old data;
@@ -19,4 +22,6 @@ module.exports = {
     TIME_DELAY,
     SEND_MESSAGE,
     MESSAGE_TEXT,
+    FB_EMAIL,
+    FB_PASS
 }
