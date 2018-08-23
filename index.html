@@ -30,6 +30,7 @@
                     <th>Location</th>
                     <th>Email</th>
                     <th>Mobile phone</th>
+                    <th>birthday</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -41,6 +42,7 @@
                     <th>Location</th>
                     <th>Email</th>
                     <th>Mobile phone</th>
+                    <th>Birthday</th>
                     <th>Action</th>
                 </tr>
             </tfoot>
@@ -96,6 +98,10 @@
                             "defaultContent": "None"
                         },
                         {
+                            "data": "birthday",
+                            "defaultContent": "None"
+                        },
+                        {
                             "data": "tag",
                             "render": function ( data, type, row ) {
                                 return Object.keys(data||{}).join(',');
@@ -126,12 +132,13 @@
                                     let node = 'users/'+(newData.gender || 'None')+'/'+(newData.location && newData.location.name || 'None') + '/' + newData.id;
                                     if(tagName == 'done') {
                                         console.log('Add Tags done success !');
-                                        return firebase.database().ref(node).remove();
-                                    }
-                                    if(newData.tag) newData.tag[tagName] = tagName
-                                    else newData.tag = {[tagName]: tagName};
-                                    firebase.database().ref(node).update(newData);
-                                    firebase.database().ref('tags/'+tagName).update({[newData.id]: newData});
+                                        firebase.database().ref(node).remove().then(()=> {console.log('success')});
+                                    } else {
+										if(newData.tag) newData.tag[tagName] = tagName
+										else newData.tag = {[tagName]: tagName};
+										firebase.database().ref(node).update(newData);
+										firebase.database().ref('tags/'+tagName).update({[newData.id]: newData});
+									}
                                 }
                                 console.log('Add Tags success !');
                             }

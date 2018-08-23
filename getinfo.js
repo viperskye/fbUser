@@ -1,6 +1,7 @@
 const fs = require("fs");
 const Promise = require('bluebird');
 const { ACCESS_TOKEN, FANPAGE_LINK, NUMBER_POST, REMOVE_OLD } = require('./config');
+const sendmess = require('./sendmessages');
 let graph = Promise.promisifyAll(require('fbgraph'));
 let firebase = require('firebase');
 let Facebook = require('fb-id');
@@ -44,7 +45,6 @@ GetComments = async function(arrId) {
     WriteComment(users,'hello');
 }
 WriteComment = async function(arrRes,info) {
-    firebase.database().ref('users').set({});
     arrRes.forEach(element => {
         console.log(element.id);
         if(element.location) {
@@ -57,8 +57,11 @@ WriteComment = async function(arrRes,info) {
 GetPosts = async function(fbId) {
     console.log('hi');
     let a = await graph.getAsync(`${fbId}/feed`, {limit: NUMBER_POST, fields:"id", access_token: ACCESS_TOKEN});
-    await GetComments(a.data);
+    console.log(a);
+	await GetComments(a.data);
     console.log('finish');
+	console.log('start sendmessages');
+	sendmess();
 }
 removeAll = async function() {
     console.log('DELETE ALL DATA ...');
