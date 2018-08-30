@@ -71,5 +71,6 @@ removeAll = async function() {
 }
 if(REMOVE_OLD === true) removeAll();
 facebook.getId(FANPAGE_LINK, function(id) {
+	if( id == 0 ) id = FANPAGE_LINK;
     GetPosts(id);
 });

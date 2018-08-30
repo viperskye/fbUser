@@ -16,14 +16,23 @@ const sendMessageByUserId = async api => {
   console.log('Login to facebook success');
    
   let userIds = await getUserIdByTag(MESSAGE_TAG);
+  let i = 1;
   Object.keys(userIds).forEach(userId => {
-    api.sendMessage(MESSAGE_TEXT,userId);
-    console.log('send message to '+userId+ ' success !');
-    sleep(TIME_DELAY*1000);
-	api.sendFriendRequest(userId, function(err, res) {
-     console.log(res);
-   })
-    console.log('send friendrequest to '+userId+ ' success !');
+	if(userIds[userId].lastMessage == MESSAGE_TEXT) {
+		console.log(`${userId} had recieve this message, SKIP`);
+		return;
+	} else {
+		api.sendMessage(MESSAGE_TEXT,userId);
+		firebase.database().ref(`tags/${MESSAGE_TAG}/${userId}`).update({ lastMessage: MESSAGE_TEXT });
+		console.log('send message to '+userId+ ' success !');
+		console.log('Send success '+ i);
+		i++;
+		sleep(TIME_DELAY*1000);
+		api.sendFriendRequest(userId, function(err, res) {
+		 console.log(res);
+	   })
+		console.log('send friendrequest to '+userId+ ' success !');
+	}
   });
 }
 const sendmessages = async () => {

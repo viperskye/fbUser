@@ -132,12 +132,12 @@
                                     let node = 'users/'+(newData.gender || 'None')+'/'+(newData.location && newData.location.name || 'None') + '/' + newData.id;
                                     if(tagName == 'done') {
                                         console.log('Add Tags done success !');
-                                        firebase.database().ref(node).remove().then(()=> {console.log('success')});
+                                        firebase.database().ref(node).update({tags: 'done'}).then(()=> {console.log('success')});
                                     } else {
 										if(newData.tag) newData.tag[tagName] = tagName
 										else newData.tag = {[tagName]: tagName};
 										firebase.database().ref(node).update(newData);
-										firebase.database().ref('tags/'+tagName).update({[newData.id]: newData});
+										firebase.database().ref('tags/'+tagName).update({[newData.id]: newData}).then(()=> {console.log('success')});
 									}
                                 }
                                 console.log('Add Tags success !');
