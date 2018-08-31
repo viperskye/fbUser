@@ -14,7 +14,6 @@ const getUserIdByTag = async function(tagName) {
 const sendMessageByUserId = async api => {
   // Here you can use the api
   console.log('Login to facebook success');
-   
   let userIds = await getUserIdByTag(MESSAGE_TAG);
   let i = 1;
   Object.keys(userIds).forEach(userId => {

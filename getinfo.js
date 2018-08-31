@@ -45,13 +45,14 @@ GetComments = async function(arrId) {
     WriteComment(users,'hello');
 }
 WriteComment = async function(arrRes,info) {
+    let objectUpdate = {};
     arrRes.forEach(element => {
-        console.log(element.id);
         if(element.location) {
-            firebase.database().ref('users/'+(element.gender || 'None')+'/'+element.location.name+'/'+element.id).update(element);
+            objectUpdate[(element.gender || 'None')+'/'+element.location.name+'/'+element.id] = element;
         } else
-            firebase.database().ref('users/'+(element.gender || 'None')+'/None/'+element.id).update(element);
-    });
+            objectUpdate[(element.gender || 'None')+'/None/'+element.id] = element;
+    })
+    await firebase.database().ref('users').update(objectUpdate);
     console.log('end viewcomments');
 }
 GetPosts = async function(fbId) {
